@@ -5,9 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>fluxodecaixa</title>
+    <script>
+      tailwind = { config: {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#0ea5a4',
+              accent: '#06b6d4'
+            }
+          }
+        }
+      } };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="bg-slate-900 text-slate-100">
+    <div id="root" class="antialiased"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

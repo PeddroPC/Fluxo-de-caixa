@@ -1,63 +1,59 @@
 import React from "react";
-import { useState } from "react";
-const CashModes = ({
-  filter,
-  setFilter,
-  search,
-  setSearch,
-  sortBy,
-  setSortBy,
-}) => {
+import useFilters from "../hooks/useFilters";
+
+const CashModes = () => {
+  const { filter, search, sortBy, setFilter, setSearch, setSortBy } = useFilters();
   return (
-    <div className="mt-8 mb-6 flex flex-wrap gap-3">
+    <div className="mt-6 mb-6 flex flex-wrap gap-3 items-center">
       <button
-        className={`rounded-xl px-5 py-2 font-medium transition duration-200 ${
+        className={`rounded-full px-4 py-2 text-sm font-medium transition duration-200 ${
           filter === "all"
-            ? "bg-blue-600 text-white shadow-md"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-primary text-white shadow"
+            : "bg-slate-800 text-slate-200 hover:bg-slate-700"
         }`}
         onClick={() => setFilter("all")}
       >
-        All
+        Todas
       </button>
 
       <button
-        className={`rounded-xl px-5 py-2 font-medium transition duration-200 ${
+        className={`rounded-full px-4 py-2 text-sm font-medium transition duration-200 ${
           filter === "income"
-            ? "bg-green-600 text-white shadow-md"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-green-600 text-white shadow"
+            : "bg-slate-800 text-slate-200 hover:bg-slate-700"
         }`}
         onClick={() => setFilter("income")}
       >
-        Income
+        Receitas
       </button>
 
       <button
-        className={`rounded-xl px-5 py-2 font-medium transition duration-200 ${
+        className={`rounded-full px-4 py-2 text-sm font-medium transition duration-200 ${
           filter === "expense"
-            ? "bg-red-600 text-white shadow-md"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            ? "bg-red-600 text-white shadow"
+            : "bg-slate-800 text-slate-200 hover:bg-slate-700"
         }`}
         onClick={() => setFilter("expense")}
       >
-        Expense
+        Despesas
       </button>
+
       <input
-        className="ml-auto rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
+        className="ml-auto rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-slate-200 focus:border-primary focus:outline-none"
         type="text"
-        placeholder="Search description..."
+        placeholder="Buscar descrição..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
       <select
-        className="ml-auto rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
+        className="ml-4 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-slate-200 focus:border-primary focus:outline-none"
         value={sortBy}
         onChange={(e) => setSortBy(e.target.value)}
       >
-        <option value="recent">Recent</option>
-        <option value="oldest">Oldest</option>
-        <option value="amountHigh">Amount (High to Low)</option>
-        <option value="amountLow">Amount (Low to High)</option>
+        <option value="recent">Recente</option>
+        <option value="oldest">Mais antigo</option>
+        <option value="amountHigh">Valor (Maior → Menor)</option>
+        <option value="amountLow">Valor (Menor → Maior)</option>
       </select>
     </div>
   );

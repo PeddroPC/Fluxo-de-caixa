@@ -1,33 +1,29 @@
 import React from "react";
-import { useState } from "react";
 
-const CashItem = ({ data, removeData, setSelectedTransaction, handleEdit }) => {
-
+const CashItem = ({ data, onDelete, onEdit }) => {
   return (
     <div
-      onDoubleClick={() => {
-        setSelectedTransaction(data);
-        handleEdit(data);
-      }}
-      className={`flex items-center justify-between rounded-2xl border p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md ${
+      className={`grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 rounded-xl border px-5 py-4
+      ${
         data.type === "income"
-          ? "border-green-200 bg-green-50"
-          : "border-red-200 bg-red-50"
+          ? "border-green-700 bg-slate-800"
+          : "border-red-700 bg-slate-800"
       }`}
     >
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800">
+      {/* Nome e Info (Esquerda) */}
+      <div className="min-w-0">
+        <h3 className="text-base font-semibold text-white whitespace-normal break-words leading-tight">
           {data.description}
         </h3>
 
-        <div className="mt-2 flex items-center gap-3 text-sm text-gray-500">
-          <span>{data.date}</span>
-
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-sm text-slate-400">{data.date}</span>
           <span
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
+            className={`rounded-full px-2 py-0.5 text-xs
+            ${
               data.type === "income"
-                ? "bg-green-200 text-green-800"
-                : "bg-red-200 text-red-800"
+                ? "bg-green-700 text-green-100"
+                : "bg-red-700 text-red-100"
             }`}
           >
             {data.type}
@@ -35,27 +31,34 @@ const CashItem = ({ data, removeData, setSelectedTransaction, handleEdit }) => {
         </div>
       </div>
 
-      <div>
+      {/* Valor (Direita, alinhado ao topo) */}
+      <div className="text-right self-start mt-0.5">
         <p
           className={`text-xl font-bold ${
-            data.type === "income" ? "text-green-600" : "text-red-600"
+            data.type === "income" ? "text-green-400" : "text-red-400"
           }`}
         >
-          {data.type === "income" ? "+" : "-"} ${Number(data.amount).toFixed(2)}
+          {data.type === "income" ? "+" : "-"} R${" "}
+          {Number(data.amount).toFixed(2)}
         </p>
       </div>
-      <button
-        className="ml-4 text-gray-400 hover:text-gray-600"
-        onClick={() => removeData(data.id)}
-      >
-        Excluir
-      </button>
-      <button
-        className="ml-4 text-gray-400 hover:text-gray-600"
-        onClick={() => handleEdit(data)}
-      >
-        Editar
-      </button>
+
+      {/* Ações (Linha de baixo, alinhadas à direita) */}
+      <div className="col-span-2 flex justify-end gap-2 mt-2">
+        <button
+          className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 transition-colors"
+          onClick={() => onEdit(data)}
+        >
+          Editar
+        </button>
+
+        <button
+          className="rounded-lg bg-red-600/20 px-4 py-2 text-sm text-red-300 hover:bg-red-600/30 transition-colors"
+          onClick={() => onDelete(data.id)}
+        >
+          Excluir
+        </button>
+      </div>
     </div>
   );
 };
