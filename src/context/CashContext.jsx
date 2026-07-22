@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import mockTransactions from "../data/mockTransactions";
 
 const CashContext = createContext(null);
@@ -23,7 +30,11 @@ export const CashProvider = ({ children }) => {
   }, []);
 
   const updateTransaction = useCallback((id, updatedTransaction) => {
-    setTransactions((current) => current.map((item) => (String(item.id) === String(id) ? updatedTransaction : item)));
+    setTransactions((current) =>
+      current.map((item) =>
+        String(item.id) === String(id) ? updatedTransaction : item,
+      ),
+    );
   }, []);
 
   const removeTransaction = useCallback((id) => {
@@ -35,16 +46,29 @@ export const CashProvider = ({ children }) => {
   }, []);
 
   const totalIncome = useMemo(
-    () => transactions.reduce((sum, item) => (item.type === "income" ? sum + Number(item.amount) : sum), 0),
+    () =>
+      transactions.reduce(
+        (sum, item) =>
+          item.type === "income" ? sum + Number(item.amount) : sum,
+        0,
+      ),
     [transactions],
   );
 
   const totalExpense = useMemo(
-    () => transactions.reduce((sum, item) => (item.type === "expense" ? sum + Number(item.amount) : sum), 0),
+    () =>
+      transactions.reduce(
+        (sum, item) =>
+          item.type === "expense" ? sum + Number(item.amount) : sum,
+        0,
+      ),
     [transactions],
   );
 
-  const balance = useMemo(() => totalIncome - totalExpense, [totalIncome, totalExpense]);
+  const balance = useMemo(
+    () => totalIncome - totalExpense,
+    [totalIncome, totalExpense],
+  );
 
   const value = useMemo(
     () => ({
@@ -57,7 +81,16 @@ export const CashProvider = ({ children }) => {
       totalExpense,
       balance,
     }),
-    [transactions, addTransaction, updateTransaction, removeTransaction, clearTransactions, totalIncome, totalExpense, balance],
+    [
+      transactions,
+      addTransaction,
+      updateTransaction,
+      removeTransaction,
+      clearTransactions,
+      totalIncome,
+      totalExpense,
+      balance,
+    ],
   );
 
   return <CashContext.Provider value={value}>{children}</CashContext.Provider>;

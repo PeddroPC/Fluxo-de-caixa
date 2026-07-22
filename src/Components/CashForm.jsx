@@ -10,26 +10,43 @@ const CashForm = () => {
 
   const getInitialFormState = () => ({
     id: Math.random().toString(36).substr(2, 9),
-    name: "",
+    description: "",
     amount: "",
     date: "",
     type: "income",
-    category: categories[14].id,
+    category: categories.find((cat) => cat.id === 14)?.name || "Outros",
     observation: "",
   });
+
+  const [categories, setCategories] = useState([
+    { id: 1, name: "Salário" },
+    { id: 2, name: "Freelance" },
+    { id: 3, name: "Bônus" },
+    { id: 4, name: "Receita" },
+    { id: 5, name: "Mercado" },
+    { id: 6, name: "Alimentação" },
+    { id: 7, name: "Saúde" },
+    { id: 8, name: "Moradia" },
+    { id: 9, name: "Contas" },
+    { id: 10, name: "Educação" },
+    { id: 11, name: "Seguro" },
+    { id: 12, name: "Transporte" },
+    { id: 13, name: "Streaming" },
+    { id: 14, name: "Outros" },
+  ]);
 
   const [formData, setFormData] = useState(getInitialFormState());
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.amount || !formData.date) {
-      showToast("Preencha todos os campos", "error");
+    if (!formData.description || !formData.amount || !formData.date) {
+      showToast("Preencha todos os campos para continuar", "error");
       return;
     }
 
     const payload = {
       id: formData.id,
-      name: formData.name,
+      description: formData.description,
       amount: formData.amount,
       date: formData.date,
       type: formData.type,
@@ -42,7 +59,7 @@ const CashForm = () => {
       showToast("Movimentação atualizada com sucesso", "success");
     } else {
       addTransaction(payload);
-      showToast("Movimentação adicionada", "success");
+      showToast("Cadastro realizado com sucesso", "success");
     }
 
     setFormData(getInitialFormState());
@@ -57,6 +74,8 @@ const CashForm = () => {
         amount: selectedTransaction.amount,
         date: selectedTransaction.date,
         type: selectedTransaction.type,
+        category: selectedTransaction.category,
+        observation: selectedTransaction.observation,
       });
     } else {
       setFormData(getInitialFormState());
@@ -74,22 +93,6 @@ const CashForm = () => {
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Ajusta para o tamanho do texto
     }
   };
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Salário" },
-    { id: 2, name: "Freelance" },
-    { id: 3, name: "Bônus" },
-    { id: 4, name: "Receita" },
-    { id: 5, name: "Mercado" },
-    { id: 6, name: "Alimentação" },
-    { id: 7, name: "Saúde" },
-    { id: 8, name: "Moradia" },
-    { id: 9, name: "Contas" },
-    { id: 10, name: "Educação" },
-    { id: 11, name: "Seguro" },
-    { id: 12, name: "Transporte" },
-    { id: 13, name: "Streaming" },
-    { id: 14, name: "Outros" },
-  ]);
 
   return (
     <form
@@ -192,17 +195,23 @@ const CashForm = () => {
             Categoria
           </label>
 
-          <input
-            type="text"
+          <select
             id="category"
             name="category"
-            placeholder="Categoria"
             value={formData.category}
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
             className="w-full rounded-xl border border-slate-700 bg-slate-700 px-4 py-3 text-slate-100 outline-none transition focus:border-primary focus:ring-2 focus:ring-accent/20"
-          />
+          >
+            <option value="">Selecione uma categoria</option>
+
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       {/* observation */}

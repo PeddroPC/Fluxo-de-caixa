@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import CashForm from "./Components/CashForm";
 import CashList from "./Components/CashList";
 import CashModes from "./Components/CashModes";
@@ -10,12 +10,15 @@ import InsightCard from "./Components/InsightCard";
 import useCash from "./hooks/useCash";
 import useFilters from "./hooks/useFilters";
 import useModal from "./hooks/useModal";
+import useToast from "./hooks/useToast";
 
 function App() {
   const { transactions, removeTransaction, totalIncome, totalExpense, balance } = useCash();
 
   const { filter, search, sortBy } = useFilters();
   const { isOpen, selectedTransaction, openModal, closeModal } = useModal();
+  const { showToast } = useToast();
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
   const filteredData = useMemo(
     () =>
@@ -96,6 +99,15 @@ function App() {
 
   const handleEdit = (transaction) => openModal(transaction);
   const handleOpenModal = () => openModal(null);
+  const handleDeleteRequest = (id) => setPendingDeleteId(id);
+  const confirmDelete = () => {
+    if (pendingDeleteId) {
+      removeTransaction(pendingDeleteId);
+      showToast("Registro excluído com sucesso", "success");
+    }
+    setPendingDeleteId(null);
+  };
+  const cancelDelete = () => setPendingDeleteId(null);
   const prediction = (balance + totalIncome * 0.08).toFixed(2);
   const goal = 30;
   const nextDue = "Cartão - 27/05";
@@ -166,7 +178,7 @@ function App() {
                 </span>
               </div>
               <div className="space-y-4">
-                <CashList data={sortedData.slice(0, 6)} onDelete={removeTransaction} onEdit={handleEdit} />
+                <CashList data={sortedData.slice(0, 6)} onDelete={handleDeleteRequest} />
               </div>
             </div>
 
@@ -180,6 +192,37 @@ function App() {
               />
             </div>
           </section>
+
+          {pendingDeleteId && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm">
+              <div className="w-full max-w-md rounded-[28px] border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/60">
+                <p className="text-sm font-medium uppercase tracking-[0.24em] text-rose-400">
+                  Confirmar exclusão
+                </p>
+                <h3 className="mt-3 text-xl font-semibold text-white">
+                  Deseja excluir este registro?
+                </h3>
+                <p className="mt-2 text-sm text-slate-400">
+                  Esta ação não poderá ser desfeita.
+                </p>
+
+                <div className="mt-6 flex justify-end gap-3">
+                  <button
+                    onClick={cancelDelete}
+                    className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmDelete}
+                    className="rounded-xl bg-rose-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-600"
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {isOpen && (
             <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/80 pt-20 backdrop-blur-sm">

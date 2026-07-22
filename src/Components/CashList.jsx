@@ -1,7 +1,7 @@
 import React from "react";
 import CashItem from "./CashItem";
 
-const CashList = ({ data = [], onDelete, onEdit }) => {
+const CashList = ({ data = [], onDelete }) => {
   return (
     <div className="mt-2 rounded-2xl p-0">
       <div className="mb-2 flex items-center justify-between px-4 py-3">
@@ -19,7 +19,6 @@ const CashList = ({ data = [], onDelete, onEdit }) => {
               key={transaction.id}
               data={transaction}
               onDelete={onDelete}
-              onEdit={onEdit}
             />
           ))
         ) : (
