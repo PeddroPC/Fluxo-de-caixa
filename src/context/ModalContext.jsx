@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 
 const ModalContext = createContext(null);
 
+// Provider responsável por abrir, fechar e manter o estado do modal de formulário.
 export const ModalProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);

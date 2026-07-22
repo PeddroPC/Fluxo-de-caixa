@@ -11,7 +11,9 @@ import mockTransactions from "../data/mockTransactions";
 const CashContext = createContext(null);
 const storageKey = "transactions";
 
+// Provider responsável por armazenar e manipular as movimentações financeiras do app.
 export const CashProvider = ({ children }) => {
+  // Inicializa o estado a partir do localStorage ou de dados mockados quando não houver persistência.
   const [transactions, setTransactions] = useState(() => {
     const stored = localStorage.getItem(storageKey);
     if (stored) {
@@ -21,6 +23,7 @@ export const CashProvider = ({ children }) => {
     return mockTransactions;
   });
 
+  // Mantém o armazenamento local sincronizado sempre que a lista de transações muda.
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(transactions));
   }, [transactions]);
@@ -45,6 +48,7 @@ export const CashProvider = ({ children }) => {
     setTransactions([]);
   }, []);
 
+  // Calcula o total de receitas e despesas com base nas transações atuais.
   const totalIncome = useMemo(
     () =>
       transactions.reduce(
@@ -65,6 +69,7 @@ export const CashProvider = ({ children }) => {
     [transactions],
   );
 
+  // Saldo líquido representa a diferença entre entradas e saídas.
   const balance = useMemo(
     () => totalIncome - totalExpense,
     [totalIncome, totalExpense],

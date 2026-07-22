@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 const ThemeContext = createContext(null);
 const storageKey = "app-theme";
 
+// Provider que controla o tema visual da aplicação e persiste a escolha no storage.
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const stored = localStorage.getItem(storageKey);

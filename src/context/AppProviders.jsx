@@ -5,6 +5,7 @@ import { CashProvider } from "./CashContext";
 import { FilterProvider } from "./FilterContext";
 import { ModalProvider } from "./ModalContext";
 
+// Agrupa todos os providers da aplicação para fornecer contexto global aos componentes.
 const AppProviders = ({ children }) => {
   return (
     <ThemeProvider>

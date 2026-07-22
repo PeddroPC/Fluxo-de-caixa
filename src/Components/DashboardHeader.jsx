@@ -1,5 +1,9 @@
 import React from "react";
 
+// Cabeçalho principal do painel com ações rápidas de limpar dados e adicionar movimentação.
+// Props recebidas:
+// - onAdd: callback para abrir a modal de cadastro.
+// - onReset: callback para limpar os dados armazenados.
 const DashboardHeader = ({ onAdd, onReset }) => {
   return (
     <div className="mb-8 flex flex-col gap-6 rounded-3xl bg-slate-900/70 p-6 shadow-xl shadow-slate-900/40 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">

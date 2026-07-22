@@ -1,6 +1,10 @@
 import React from "react";
 import CashItem from "./CashItem";
 
+// Componente responsável por montar a lista de movimentações recebidas do dashboard.
+// Props recebidas:
+// - data: array de transações a serem exibidas.
+// - onDelete: callback para a ação de exclusão de cada item.
 const CashList = ({ data = [], onDelete }) => {
   return (
     <div className="mt-2 rounded-2xl p-0">

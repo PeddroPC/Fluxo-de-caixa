@@ -3,6 +3,7 @@ import useCash from "../hooks/useCash";
 import useModal from "../hooks/useModal";
 import useToast from "../hooks/useToast";
 
+// Formulário reutilizável para cadastro e edição de movimentações financeiras.
 const CashForm = () => {
   const { addTransaction, updateTransaction } = useCash();
   const { selectedTransaction, closeModal } = useModal();
@@ -37,6 +38,7 @@ const CashForm = () => {
 
   const [formData, setFormData] = useState(getInitialFormState());
 
+  // Valida os campos obrigatórios antes de salvar ou atualizar a movimentação.
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.description || !formData.amount || !formData.date) {
@@ -66,6 +68,7 @@ const CashForm = () => {
     closeModal();
   };
 
+  // Quando a modal entra em modo de edição, preenche o formulário com os dados da transação selecionada.
   useEffect(() => {
     if (selectedTransaction) {
       setFormData({
@@ -83,14 +86,13 @@ const CashForm = () => {
   }, [selectedTransaction]);
   const textareaRef = useRef(null);
 
+  // Atualiza a observação e ajusta a altura do textarea conforme o conteúdo cresce.
   const handleObservationChange = (e) => {
-    // 1. Atualiza o estado normalmente
     setFormData({ ...formData, observation: e.target.value });
 
-    // 2. Lógica para expandir a altura automaticamente
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"; // Reseta a altura para calcular o novo tamanho
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`; // Ajusta para o tamanho do texto
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   };
 

@@ -1,6 +1,7 @@
 import React from "react";
 import useFilters from "../hooks/useFilters";
 
+// Controles de visualização para filtrar, buscar e ordenar as movimentações.
 const CashModes = () => {
   const { filter, search, sortBy, setFilter, setSearch, setSortBy } = useFilters();
   return (

@@ -1,4 +1,3 @@
-import { useMemo, useState } from "react";
 import CashForm from "./Components/CashForm";
 import CashList from "./Components/CashList";
 import CashModes from "./Components/CashModes";
@@ -7,111 +6,29 @@ import DashboardHeader from "./Components/DashboardHeader";
 import SummaryCard from "./Components/SummaryCard";
 import PieChartCard from "./Components/PieChartCard";
 import InsightCard from "./Components/InsightCard";
-import useCash from "./hooks/useCash";
-import useFilters from "./hooks/useFilters";
+import useDashboard from "./hooks/useDashboard";
 import useModal from "./hooks/useModal";
-import useToast from "./hooks/useToast";
 
+// Componente principal da aplicação: organiza a estrutura visual e delega a lógica ao hook de dashboard.
 function App() {
-  const { transactions, removeTransaction, totalIncome, totalExpense, balance } = useCash();
+  const {
+    balance,
+    totalIncome,
+    totalExpense,
+    sortedData,
+    pieData,
+    pendingDeleteId,
+    handleOpenModal,
+    handleDeleteRequest,
+    confirmDelete,
+    cancelDelete,
+    prediction,
+    goal,
+    nextDue,
+    tip,
+  } = useDashboard();
 
-  const { filter, search, sortBy } = useFilters();
-  const { isOpen, selectedTransaction, openModal, closeModal } = useModal();
-  const { showToast } = useToast();
-  const [pendingDeleteId, setPendingDeleteId] = useState(null);
-
-  const filteredData = useMemo(
-    () =>
-      transactions.filter((item) => {
-        const matchesFilter = filter === "all" || item.type === filter;
-        const matchesSearch = item.description.toLowerCase().includes(search.toLowerCase());
-        return matchesFilter && matchesSearch;
-      }),
-    [transactions, filter, search],
-  );
-
-  const sortedData = useMemo(
-    () =>
-      [...filteredData].sort((a, b) => {
-        if (sortBy === "recent") {
-          return new Date(b.date) - new Date(a.date);
-        }
-        if (sortBy === "oldest") {
-          return new Date(a.date) - new Date(b.date);
-        }
-        if (sortBy === "amountHigh") {
-          return Number(b.amount) - Number(a.amount);
-        }
-        if (sortBy === "amountLow") {
-          return Number(a.amount) - Number(b.amount);
-        }
-        return 0;
-      }),
-    [filteredData, sortBy],
-  );
-
-  const categoryMap = {
-    salary: "Salário",
-    freelance: "Freelance",
-    bonus: "Bônus",
-    pix: "Receita",
-    mercado: "Mercado",
-    restaurante: "Alimentação",
-    farmácia: "Saúde",
-    aluguel: "Moradia",
-    energia: "Contas",
-    água: "Contas",
-    curso: "Educação",
-    seguro: "Seguro",
-    academia: "Saúde",
-    uber: "Transporte",
-    gasolina: "Transporte",
-    netflix: "Streaming",
-    spotify: "Streaming",
-    youtube: "Streaming",
-    carbur: "Transporte",
-  };
-
-  const normalizeCategory = (description) => {
-    const normalized = description.toLowerCase();
-    const foundKey = Object.keys(categoryMap).find((key) => normalized.includes(key));
-    return categoryMap[foundKey] || (normalized.includes("salário") ? "Salário" : "Outros");
-  };
-
-  const categoryTotals = useMemo(
-    () =>
-      transactions.reduce((acc, item) => {
-        const category = normalizeCategory(item.description);
-        acc[category] = (acc[category] || 0) + Number(item.amount);
-        return acc;
-      }, {}),
-    [transactions],
-  );
-
-  const pieData = useMemo(
-    () =>
-      Object.entries(categoryTotals)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([label, value]) => ({ label, value })),
-    [categoryTotals],
-  );
-
-  const handleEdit = (transaction) => openModal(transaction);
-  const handleOpenModal = () => openModal(null);
-  const handleDeleteRequest = (id) => setPendingDeleteId(id);
-  const confirmDelete = () => {
-    if (pendingDeleteId) {
-      removeTransaction(pendingDeleteId);
-      showToast("Registro excluído com sucesso", "success");
-    }
-    setPendingDeleteId(null);
-  };
-  const cancelDelete = () => setPendingDeleteId(null);
-  const prediction = (balance + totalIncome * 0.08).toFixed(2);
-  const goal = 30;
-  const nextDue = "Cartão - 27/05";
-  const tip = "Revise as assinaturas e priorize reservas para gastos recorrentes.";
+  const { isOpen, selectedTransaction, closeModal } = useModal();
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">

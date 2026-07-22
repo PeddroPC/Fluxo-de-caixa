@@ -1,3 +1,4 @@
+// Dados iniciais usados para popular a aplicação quando não há transações persistidas.
 const mockTransactions = [
   {
     id: 1,

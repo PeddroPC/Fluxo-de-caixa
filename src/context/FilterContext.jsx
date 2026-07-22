@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 
 const FilterContext = createContext(null);
 
+// Provider que controla os filtros, texto de busca e ordenação da lista de movimentações.
 export const FilterProvider = ({ children }) => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");

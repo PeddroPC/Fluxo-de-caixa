@@ -2,6 +2,10 @@ import React from "react";
 
 const chartColors = ["#22d3ee", "#14b8a6", "#2563eb", "#38bdf8", "#7dd3fc"];
 
+// Componente que monta um gráfico em formato de pizza a partir de dados agregados por categoria.
+// Props recebidas:
+// - title: título exibido no topo do card.
+// - data: array com os rótulos e valores das categorias.
 const PieChartCard = ({ title, data }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 

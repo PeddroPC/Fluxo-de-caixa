@@ -15,6 +15,7 @@ const toastStyles = {
   info: "border-sky-500/40 bg-sky-500/15 text-sky-200",
 };
 
+// Componente visual que exibe notificações rápidas na tela.
 const ToastViewport = ({ toast, hideToast }) => {
   if (!toast.open) {
     return null;
@@ -57,6 +58,7 @@ const ToastViewport = ({ toast, hideToast }) => {
   );
 };
 
+// Provider que controla mensagens de feedback para ações de cadastro, edição e exclusão.
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState({ open: false, message: "", type: "info" });
   const timeoutRef = useRef(null);

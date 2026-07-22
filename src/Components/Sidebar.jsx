@@ -1,5 +1,6 @@
 import React from "react";
 
+// Lista estática de itens do menu lateral, mantida simples para a interface atual.
 const navItems = [
   { label: "Dashboard", icon: "📊", active: true },
   { label: "Receitas", icon: "💰" },

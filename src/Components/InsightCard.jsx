@@ -1,5 +1,12 @@
 import React from "react";
 
+// Card de insights com projeção financeira, meta mensal e dica de gestão.
+// Props recebidas:
+// - balance: saldo atual da conta.
+// - goal: percentual de meta mensal.
+// - nextDue: descrição do próximo vencimento.
+// - tip: recomendação financeira exibida ao usuário.
+// - prediction: valor previsto calculado pelo dashboard.
 const InsightCard = ({ balance, goal, nextDue, tip, prediction }) => {
   return (
     <div className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-lg shadow-slate-950/20">

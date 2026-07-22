@@ -1,5 +1,12 @@
 import React from "react";
 
+// Exibe um resumo financeiro com destaque visual para saldo, receitas, despesas e economia.
+// Props recebidas:
+// - title: título principal do card.
+// - value: valor exibido.
+// - subtext: texto complementar abaixo do título.
+// - icon: emoji ou ícone representativo.
+// - accent: classe de cor para o bloco do ícone.
 const SummaryCard = ({ title, value, subtext, icon, accent }) => {
   return (
     <div className="group rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-lg shadow-slate-950/20 transition hover:-translate-y-1 hover:border-cyan-500/40 hover:bg-slate-900">
