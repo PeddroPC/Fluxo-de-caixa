@@ -4,17 +4,20 @@ import { ToastProvider } from "./ToastContext";
 import { CashProvider } from "./CashContext";
 import { FilterProvider } from "./FilterContext";
 import { ModalProvider } from "./ModalContext";
+import { DateProvider } from "./DateContext";
 
 // Agrupa todos os providers da aplicação para fornecer contexto global aos componentes.
 const AppProviders = ({ children }) => {
   return (
     <ThemeProvider>
       <ToastProvider>
-        <CashProvider>
-          <FilterProvider>
-            <ModalProvider>{children}</ModalProvider>
-          </FilterProvider>
-        </CashProvider>
+        <DateProvider>
+          <CashProvider>
+            <FilterProvider>
+              <ModalProvider>{children}</ModalProvider>
+            </FilterProvider>
+          </CashProvider>
+        </DateProvider>
       </ToastProvider>
     </ThemeProvider>
   );

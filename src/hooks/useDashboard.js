@@ -1,31 +1,56 @@
 import { useMemo, useState } from "react";
 import useCash from "./useCash";
+import useDate from "./useDate";
 import useFilters from "./useFilters";
 import useModal from "./useModal";
 import useToast from "./useToast";
+import {
+  calculateDashboardSummary,
+  getPreviousPeriod,
+  getTransactionsByPeriod,
+} from "../features/dashboard/calculations";
+
+const monthNames = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
 
 // Hook responsável por reunir os dados e as ações da tela principal do dashboard.
 const useDashboard = () => {
-  // Consome os estados globais compartilhados pelos providers de cash, filtros, modal e toast.
-  const { transactions, removeTransaction, totalIncome, totalExpense, balance } = useCash();
+  const { transactions, removeTransaction } = useCash();
   const { filter, search, sortBy } = useFilters();
   const { openModal } = useModal();
   const { showToast } = useToast();
+  const { selectedPeriod } = useDate();
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
 
-  // Filtra as movimentações com base no tipo e no texto digitado na busca.
+  const periodTransactions = useMemo(
+    () => getTransactionsByPeriod(transactions, selectedPeriod),
+    [transactions, selectedPeriod],
+  );
+
   const filteredData = useMemo(
     () =>
-      transactions.filter((item) => {
+      periodTransactions.filter((item) => {
+        const description = item.description ?? item.nome ?? "";
         const matchesFilter = filter === "all" || item.type === filter;
-        const matchesSearch = item.description.toLowerCase().includes(search.toLowerCase());
+        const matchesSearch = description.toLowerCase().includes(search.toLowerCase());
 
         return matchesFilter && matchesSearch;
       }),
-    [transactions, filter, search],
+    [periodTransactions, filter, search],
   );
 
-  // Ordena as movimentações filtradas conforme a seleção do usuário.
   const sortedData = useMemo(
     () =>
       [...filteredData].sort((a, b) => {
@@ -50,26 +75,82 @@ const useDashboard = () => {
     [filteredData, sortBy],
   );
 
-  // Agrupa os valores por categoria para alimentar o gráfico de despesas.
-  const categoryTotals = useMemo(
-    () =>
-      transactions.reduce((acc, item) => {
-        const category = item.category || "Outros";
-        acc[category] = (acc[category] || 0) + Number(item.amount);
-        return acc;
-      }, {}),
-    [transactions],
+  const summary = useMemo(
+    () => calculateDashboardSummary(transactions, selectedPeriod),
+    [transactions, selectedPeriod],
   );
 
-  // Converte o agrupamento em um formato pronto para o componente do gráfico.
   const pieData = useMemo(
     () =>
-      Object.entries(categoryTotals)
+      Object.entries(summary.categoryTotals)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([label, value]) => ({ label, value })),
-    [categoryTotals],
+    [summary.categoryTotals],
   );
+
+  const previousPeriod = useMemo(() => getPreviousPeriod(selectedPeriod), [selectedPeriod]);
+  const periodLabel = `${monthNames[selectedPeriod.month - 1]} ${selectedPeriod.year}`;
+  const previousPeriodLabel = `${monthNames[previousPeriod.month - 1]} ${previousPeriod.year}`;
+
+  const summaryCards = [
+    {
+      title: "Saldo Atual",
+      icon: "💎",
+      accent: "bg-cyan-500",
+      currentValue: summary.balance.currentValue,
+      previousValue: summary.balance.previousValue,
+      variationAmount: summary.balance.difference,
+      variationPercent: summary.balance.percent,
+      isPositive: summary.balance.isPositive,
+      comparisonLabel: `Comparado com ${previousPeriodLabel}`,
+    },
+    {
+      title: "Receitas do período",
+      icon: "⬆️",
+      accent: "bg-emerald-500",
+      currentValue: summary.income.currentValue,
+      previousValue: summary.income.previousValue,
+      variationAmount: summary.income.difference,
+      variationPercent: summary.income.percent,
+      isPositive: summary.income.isPositive,
+      comparisonLabel: `Comparado com ${previousPeriodLabel}`,
+    },
+    {
+      title: "Despesas do período",
+      icon: "⬇️",
+      accent: "bg-rose-500",
+      currentValue: summary.expense.currentValue,
+      previousValue: summary.expense.previousValue,
+      variationAmount: summary.expense.difference,
+      variationPercent: summary.expense.percent,
+      isPositive: summary.expense.isPositive,
+      comparisonLabel: `Comparado com ${previousPeriodLabel}`,
+    },
+    {
+      title: "Economia",
+      icon: "💼",
+      accent: "bg-sky-500",
+      currentValue: summary.economy.currentValue,
+      previousValue: summary.economy.previousValue,
+      variationAmount: summary.economy.difference,
+      variationPercent: summary.economy.percent,
+      isPositive: summary.economy.isPositive,
+      comparisonLabel: `Comparado com ${previousPeriodLabel}`,
+    },
+  ];
+
+  const topCategory = pieData[0]?.label ?? "Nenhuma despesa";
+
+  const investmentSummary = {
+    title: "Resumo dos investimentos",
+    currentValue: summary.investment.currentValue,
+    previousValue: summary.investment.previousValue,
+    variationAmount: summary.investment.difference,
+    variationPercent: summary.investment.percent,
+    isPositive: summary.investment.isPositive,
+    comparisonLabel: `Comparado com ${previousPeriodLabel}`,
+  };
 
   const handleOpenModal = () => openModal(null);
   const handleDeleteRequest = (id) => setPendingDeleteId(id);
@@ -84,17 +165,20 @@ const useDashboard = () => {
   };
 
   const cancelDelete = () => setPendingDeleteId(null);
-  const prediction = (balance + totalIncome * 0.08).toFixed(2);
+  const prediction = (summary.balance.currentValue + summary.income.currentValue * 0.08).toFixed(2);
   const goal = 30;
   const nextDue = "Cartão - 27/05";
   const tip = "Revise as assinaturas e priorize reservas para gastos recorrentes.";
 
   return {
-    balance,
-    totalIncome,
-    totalExpense,
+    balanceValue: summary.balance.currentValue,
+    summaryCards,
+    investmentSummary,
+    recentTransactions: summary.recentTransactions.slice(0, 5),
     sortedData,
     pieData,
+    topCategory,
+    periodLabel,
     pendingDeleteId,
     handleOpenModal,
     handleDeleteRequest,

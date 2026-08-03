@@ -6,6 +6,7 @@ const ModalContext = createContext(null);
 export const ModalProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
 
   const openModal = useCallback((transaction = null) => {
     setSelectedTransaction(transaction);
@@ -17,9 +18,20 @@ export const ModalProvider = ({ children }) => {
     setSelectedTransaction(null);
   }, []);
 
+  const openTransactionModal = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsTransactionOpen(true);
+    console.log("Abrindo modal de transação:", transaction);
+  }
+
+  const closeTransactionModal = () => {
+    setIsTransactionOpen(false);
+    setSelectedTransaction(null);
+  }
+
   const value = useMemo(
-    () => ({ isOpen, selectedTransaction, openModal, closeModal, setSelectedTransaction }),
-    [isOpen, selectedTransaction, openModal, closeModal],
+    () => ({ isOpen, selectedTransaction, openModal, closeModal, setSelectedTransaction, openTransactionModal, closeTransactionModal, isTransactionOpen }),
+    [isOpen, selectedTransaction, openModal, closeModal, isTransactionOpen],
   );
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;

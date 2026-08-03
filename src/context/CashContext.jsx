@@ -11,69 +11,63 @@ import mockTransactions from "../data/mockTransactions";
 const CashContext = createContext(null);
 const storageKey = "transactions";
 
+const normalizeTransaction = (transaction) => ({
+  ...transaction,
+  description: transaction.description ?? transaction.nome ?? "Movimentação",
+  observation: transaction.observation ?? "",
+  category:
+    transaction.category ??
+    (transaction.type === "investment" ? undefined : "Outros"),
+});
+
+const getInitialTransactions = () => {
+  const stored = localStorage.getItem(storageKey);
+
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) && parsed.length > 0
+        ? parsed.map(normalizeTransaction)
+        : mockTransactions.map(normalizeTransaction);
+    } catch (error) {
+      console.error("Não foi possível carregar as transações salvas.", error);
+    }
+  }
+
+  return mockTransactions.map(normalizeTransaction);
+};
+
 // Provider responsável por armazenar e manipular as movimentações financeiras do app.
 export const CashProvider = ({ children }) => {
-  // Inicializa o estado a partir do localStorage ou de dados mockados quando não houver persistência.
-  const [transactions, setTransactions] = useState(() => {
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return parsed.length > 0 ? parsed : mockTransactions;
-    }
-    return mockTransactions;
-  });
+  const [transactions, setTransactions] = useState(() => getInitialTransactions());
 
-  // Mantém o armazenamento local sincronizado sempre que a lista de transações muda.
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(transactions));
   }, [transactions]);
 
   const addTransaction = useCallback((transaction) => {
-    setTransactions((current) => [...current, transaction]);
+    setTransactions((current) => [...current, normalizeTransaction(transaction)]);
   }, []);
 
   const updateTransaction = useCallback((id, updatedTransaction) => {
     setTransactions((current) =>
       current.map((item) =>
-        String(item.id) === String(id) ? updatedTransaction : item,
+        String(item.id) === String(id)
+          ? normalizeTransaction({ ...item, ...updatedTransaction })
+          : item,
       ),
     );
   }, []);
 
   const removeTransaction = useCallback((id) => {
-    setTransactions((current) => current.filter((item) => item.id !== id));
+    setTransactions((current) =>
+      current.filter((item) => String(item.id) !== String(id)),
+    );
   }, []);
 
   const clearTransactions = useCallback(() => {
     setTransactions([]);
   }, []);
-
-  // Calcula o total de receitas e despesas com base nas transações atuais.
-  const totalIncome = useMemo(
-    () =>
-      transactions.reduce(
-        (sum, item) =>
-          item.type === "income" ? sum + Number(item.amount) : sum,
-        0,
-      ),
-    [transactions],
-  );
-
-  const totalExpense = useMemo(
-    () =>
-      transactions.reduce(
-        (sum, item) =>
-          item.type === "expense" ? sum + Number(item.amount) : sum,
-        0,
-      ),
-    [transactions],
-  );
-
-  // Saldo líquido representa a diferença entre entradas e saídas.
-  const balance = useMemo(
-    () => totalIncome - totalExpense,
-    [totalIncome, totalExpense],
-  );
 
   const value = useMemo(
     () => ({
@@ -82,20 +76,8 @@ export const CashProvider = ({ children }) => {
       updateTransaction,
       removeTransaction,
       clearTransactions,
-      totalIncome,
-      totalExpense,
-      balance,
     }),
-    [
-      transactions,
-      addTransaction,
-      updateTransaction,
-      removeTransaction,
-      clearTransactions,
-      totalIncome,
-      totalExpense,
-      balance,
-    ],
+    [transactions, addTransaction, updateTransaction, removeTransaction, clearTransactions],
   );
 
   return <CashContext.Provider value={value}>{children}</CashContext.Provider>;

@@ -1,5 +1,4 @@
 import CashForm from "./Components/CashForm";
-import CashList from "./Components/CashList";
 import CashModes from "./Components/CashModes";
 import Sidebar from "./Components/Sidebar";
 import DashboardHeader from "./Components/DashboardHeader";
@@ -8,15 +7,18 @@ import PieChartCard from "./Components/PieChartCard";
 import InsightCard from "./Components/InsightCard";
 import useDashboard from "./hooks/useDashboard";
 import useModal from "./hooks/useModal";
+import TransactionDetailsModal from "./Components/TransactionDetailsModal";
 
 // Componente principal da aplicação: organiza a estrutura visual e delega a lógica ao hook de dashboard.
 function App() {
   const {
-    balance,
-    totalIncome,
-    totalExpense,
-    sortedData,
+    balanceValue,
+    summaryCards,
+    investmentSummary,
+    recentTransactions,
     pieData,
+    topCategory,
+    periodLabel,
     pendingDeleteId,
     handleOpenModal,
     handleDeleteRequest,
@@ -35,7 +37,7 @@ function App() {
       <div className="flex min-h-screen">
         <Sidebar />
 
-        <main className="flex-1 p-8 lg:p-10">
+        <main className="flex-1 px-6 py-6 lg:px-10 lg:py-10 max-w-[1480px] mx-auto">
           <DashboardHeader
             onAdd={handleOpenModal}
             onReset={() => {
@@ -46,67 +48,112 @@ function App() {
 
           <CashModes />
 
-          <section className="grid gap-6 xl:grid-cols-[1fr_auto]">
-            <div className="grid gap-6 sm:grid-cols-2">
-              <SummaryCard
-                title="Saldo Atual"
-                subtext="Visão geral"
-                value={balance.toFixed(2)}
-                icon="💎"
-                accent="bg-cyan-500"
-              />
-              <SummaryCard
-                title="Receitas do mês"
-                subtext="Entradas"
-                value={totalIncome.toFixed(2)}
-                icon="⬆️"
-                accent="bg-emerald-500"
-              />
-              <SummaryCard
-                title="Despesas do mês"
-                subtext="Saídas"
-                value={totalExpense.toFixed(2)}
-                icon="⬇️"
-                accent="bg-rose-500"
-              />
-              <SummaryCard
-                title="Economia do mês"
-                subtext="Saldo líquido"
-                value={(totalIncome - totalExpense).toFixed(2)}
-                icon="💼"
-                accent="bg-sky-500"
-              />
+          <section className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-slate-950/20">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-cyan-300/80">Resumo executivo</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">Visão consolidada de {periodLabel}</h2>
+              </div>
+              <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.24em] text-cyan-300">
+                Comparativo com o mês anterior
+              </span>
             </div>
 
-            <div className="grid gap-6">
-              <PieChartCard title="Gastos por categoria" data={pieData} />
+            <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+              <div className="grid h-min content-start gap-4 sm:grid-cols-2">
+                {summaryCards.map((card) => (
+                  <SummaryCard key={card.title} {...card} />
+                ))}
+              </div>
+
+              <div className="rounded-[24px] border border-slate-800 bg-slate-950/70 p-5">
+                <p className="text-sm text-slate-400">Resumo dos investimentos</p>
+                <h3 className="mt-2 text-xl font-semibold text-white">Performance do portfólio</h3>
+
+                <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+                  <p className="text-sm text-slate-400">Valor atual</p>
+                  <p className="mt-2 text-3xl font-semibold text-white">
+                    R$ {investmentSummary.currentValue.toFixed(2)}
+                  </p>
+                  <p className="mt-3 text-sm text-slate-400">{investmentSummary.comparisonLabel}</p>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+                  <div>
+                    <p className="text-sm text-slate-400">Variação</p>
+                    <p className={`mt-1 text-base font-semibold ${investmentSummary.isPositive ? "text-emerald-400" : "text-rose-400"}`}>
+                      {investmentSummary.isPositive ? "+" : "-"}R$ {Math.abs(investmentSummary.variationAmount).toFixed(2)}
+                    </p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-sm font-medium ${investmentSummary.isPositive ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
+                    {investmentSummary.isPositive ? "▲" : "▼"} {Math.abs(investmentSummary.variationPercent).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
             </div>
           </section>
 
-          <section className="mt-8 grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
-            <div className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-slate-950/20">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Últimas Movimentações</p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">Atividades recentes</h2>
-                </div>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-400">
-                  {sortedData.length} itens
-                </span>
-              </div>
-              <div className="space-y-4">
-                <CashList data={sortedData.slice(0, 6)} onDelete={handleDeleteRequest} />
-              </div>
-            </div>
+          <section className="mt-8 grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
+            <PieChartCard
+              title="Distribuição das despesas"
+              data={pieData}
+              subtitle={topCategory !== "Nenhuma despesa" ? `Categoria principal: ${topCategory}` : "Nenhuma despesa neste período"}
+            />
 
             <div className="grid gap-6">
               <InsightCard
-                balance={balance.toFixed(2)}
+                balance={balanceValue.toFixed(2)}
                 goal={goal}
                 nextDue={nextDue}
                 tip={tip}
                 prediction={prediction}
+                investments={[]}
+                totalInvested={investmentSummary.currentValue}
+                totalCurrentValue={investmentSummary.currentValue}
+                totalProfit={investmentSummary.variationAmount}
+                profitabilityPercentage={investmentSummary.variationPercent}
               />
+
+              <div className="rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-slate-950/20">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-400">Últimas movimentações</p>
+                    <h3 className="mt-2 text-xl font-semibold text-white">Atividades recentes</h3>
+                  </div>
+                  <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-400">
+                    {recentTransactions.length} itens
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {recentTransactions.map((item) => {
+                    const isIncome = item.type === "income";
+                    const isInvestment = item.type === "investment";
+                    const amountColor = isIncome
+                      ? "text-emerald-400"
+                      : isInvestment
+                        ? "text-cyan-400"
+                        : "text-rose-400";
+
+                    return (
+                      <div key={item.id} className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3">
+                        <div>
+                          <p className="text-sm font-medium text-white">{item.description}</p>
+                          <p className="text-xs text-slate-500">{item.category || "Sem categoria"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-sm font-semibold ${amountColor}`}>
+                            {isIncome ? "+" : "-"}R$ {Number(item.amount).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {new Date(item.date).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </section>
 
@@ -157,6 +204,7 @@ function App() {
               </div>
             </div>
           )}
+          <TransactionDetailsModal />
         </main>
       </div>
     </div>

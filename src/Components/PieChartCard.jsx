@@ -6,7 +6,7 @@ const chartColors = ["#22d3ee", "#14b8a6", "#2563eb", "#38bdf8", "#7dd3fc"];
 // Props recebidas:
 // - title: título exibido no topo do card.
 // - data: array com os rótulos e valores das categorias.
-const PieChartCard = ({ title, data }) => {
+const PieChartCard = ({ title, data, subtitle }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
@@ -15,6 +15,7 @@ const PieChartCard = ({ title, data }) => {
         <div>
           <p className="text-sm text-slate-400">{title}</p>
           <h3 className="mt-2 text-xl font-semibold text-white">Gastos por categoria</h3>
+          {subtitle && <p className="mt-2 text-sm text-slate-500">{subtitle}</p>}
         </div>
         <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-400">
           Total {data.length}

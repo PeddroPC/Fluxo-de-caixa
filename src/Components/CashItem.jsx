@@ -6,19 +6,48 @@ import { useModal } from "../context/ModalContext";
 // - data: objeto com os dados da transação.
 // - onDelete: callback executado ao clicar em excluir.
 const CashItem = ({ data, onDelete }) => {
-  const { openModal } = useModal();
+  const { openModal, openTransactionModal } = useModal();
 
   const isIncome = data.type === "income";
+  const isInvestment = data.type === "investment";
+  const title = data.description ?? data.nome ?? "Movimentação";
+  const amountPrefix = isInvestment ? "" : isIncome ? "+" : "-";
+  const amountColor = isInvestment
+    ? "text-amber-400"
+    : isIncome
+      ? "text-green-400"
+      : "text-red-400";
+  const iconTone = isInvestment
+    ? "bg-amber-500/10 text-amber-400"
+    : isIncome
+      ? "bg-green-500/10 text-green-500"
+      : "bg-red-500/10 text-red-500";
+
   return (
-    <div className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl bg-slate-800/40 p-4 border border-slate-700/50 transition-all hover:bg-slate-800 hover:border-slate-600 shadow-sm">
-      {/* Esquerda: Ícone e Detalhes */}
-      <div className="flex items-start sm:items-center gap-4 min-w-0 flex-1">
-        {/* Ícone Redondo (Substitui a necessidade de bordas coloridas no card todo) */}
+    <div
+      className="group flex flex-col justify-between gap-4 rounded-2xl border border-slate-700/50 bg-slate-800/40 p-4 shadow-sm transition-all hover:border-slate-600 hover:bg-slate-800 sm:flex-row sm:items-center"
+      onDoubleClick={() => openTransactionModal(data)}
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-4 sm:items-center">
         <div
-          className={`flex shrink-0 items-center justify-center h-12 w-12 rounded-full 
-          ${isIncome ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconTone}`}
         >
-          {isIncome ? (
+          {isInvestment ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8v8m0 0l-4-4m4 4l4-4"
+              />
+            </svg>
+          ) : isIncome ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6"
@@ -51,33 +80,40 @@ const CashItem = ({ data, onDelete }) => {
           )}
         </div>
 
-        {/* Textos: Nome, Metadados e Observação */}
         <div className="min-w-0 flex-1">
           <h3
-            className="text-base sm:text-lg font-medium text-slate-100 truncate"
-            title={data.nome || data.description}
+            className="truncate text-base font-medium text-slate-100 sm:text-lg"
+            title={title}
           >
-            {data.nome || data.description}
+            {title}
           </h3>
 
-          {/* Linha de Metadados (Data e Categoria) */}
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-400">
             <span>{data.date}</span>
 
-            {data.category && data.category !== "Outros" && (
+            {isInvestment ? (
               <>
                 <span className="text-slate-600">•</span>
                 <span className="rounded bg-slate-700/50 px-1.5 py-0.5 text-xs text-slate-300">
-                  {data.category}
+                  {data.investmentType || "Investimento"}
                 </span>
               </>
+            ) : (
+              data.category &&
+              data.category !== "Outros" && (
+                <>
+                  <span className="text-slate-600">•</span>
+                  <span className="rounded bg-slate-700/50 px-1.5 py-0.5 text-xs text-slate-300">
+                    {data.category}
+                  </span>
+                </>
+              )
             )}
           </div>
 
-          {/* Observação (Agora é um texto suave, sem a caixa preta) */}
           {data.observation && (
             <p
-              className="    mt-2 text-sm text-slate-400 overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]"
+              className="mt-2 overflow-hidden text-ellipsis text-sm text-slate-400 [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]"
               title={data.observation}
             >
               {data.observation}
@@ -86,16 +122,13 @@ const CashItem = ({ data, onDelete }) => {
         </div>
       </div>
 
-      {/* Direita: Valor e Ações */}
-      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 shrink-0 pl-16 sm:pl-0 border-t border-slate-700/50 sm:border-0 pt-3 sm:pt-0">
-        {/* Valor */}
+      <div className="flex flex-row items-center justify-between gap-3 border-t border-slate-700/50 pt-3 pl-16 shrink-0 sm:flex-col sm:items-end sm:justify-center sm:border-0 sm:pt-0 sm:pl-0">
         <p
-          className={`text-lg sm:text-xl font-bold tracking-tight whitespace-nowrap ${isIncome ? "text-green-400" : "text-red-400"}`}
+          className={`whitespace-nowrap text-lg font-bold tracking-tight sm:text-xl ${amountColor}`}
         >
-          {isIncome ? "+" : "-"} R$ {Number(data.amount).toFixed(2)}
+          {amountPrefix} R$ {Number(data.amount || 0).toFixed(2)}
         </p>
 
-        {/* Botões de Ação (Menores e mais discretos) */}
         <div className="flex gap-2">
           <button
             className="flex items-center justify-center rounded-lg bg-slate-700/50 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-600 hover:text-white"

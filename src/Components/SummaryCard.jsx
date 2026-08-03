@@ -1,25 +1,51 @@
 import React from "react";
 
-// Exibe um resumo financeiro com destaque visual para saldo, receitas, despesas e economia.
-// Props recebidas:
-// - title: título principal do card.
-// - value: valor exibido.
-// - subtext: texto complementar abaixo do título.
-// - icon: emoji ou ícone representativo.
-// - accent: classe de cor para o bloco do ícone.
-const SummaryCard = ({ title, value, subtext, icon, accent }) => {
+const SummaryCard = ({
+  title,
+  currentValue,
+  previousValue,
+  variationAmount,
+  variationPercent,
+  isPositive,
+  icon,
+  accent,
+  comparisonLabel,
+}) => {
+  const trendColor = isPositive ? "text-emerald-400" : "text-rose-400";
+  const trendIcon = isPositive ? "▲" : "▼";
+  const signedAmount = `${isPositive ? "+" : "-"}R$ ${Math.abs(variationAmount).toFixed(2)}`;
+  const signedPercent = `${isPositive ? "+" : "-"}${Math.abs(variationPercent).toFixed(0)}%`;
+
   return (
-    <div className="group rounded-[28px] border border-slate-800 bg-slate-900/70 p-6 shadow-lg shadow-slate-950/20 transition hover:-translate-y-1 hover:border-cyan-500/40 hover:bg-slate-900">
-      <div className="mb-6 flex items-center justify-between">
-        <span className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${accent} text-xl text-white shadow-lg shadow-slate-950/20`}>
-          {icon}
-        </span>
-        <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-400">
-          {subtext}
-        </span>
+    <div className="group flex h-full w-full flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/70 p-4 shadow-lg shadow-slate-950/20 transition-all hover:-translate-y-0.5 hover:border-cyan-500/40 hover:bg-slate-900">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <span
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent} text-lg text-white shadow-md`}
+          >
+            {icon}
+          </span>
+
+          <div>
+            <p className="text-[11px] font-medium text-slate-400">{title}</p>
+            <p className="mt-1 text-xl font-bold tracking-tight text-white">
+              R$ {currentValue.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${trendColor}`}>
+          {trendIcon} {signedPercent}
+        </div>
       </div>
-      <p className="text-sm text-slate-400">{title}</p>
-      <p className="mt-3 text-3xl font-semibold text-white">R$ {value}</p>
+
+      <div className="mt-4 space-y-2">
+        <p className={`text-sm font-semibold ${trendColor}`}>{signedAmount}</p>
+        <p className="text-sm text-slate-400">{comparisonLabel}</p>
+        <p className="text-xs text-slate-500">
+          Mês anterior: R$ {previousValue.toFixed(2)}
+        </p>
+      </div>
     </div>
   );
 };
