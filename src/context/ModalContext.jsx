@@ -7,10 +7,12 @@ export const ModalProvider = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [modalDefault, setModalDefault] = useState(null);
 
-  const openModal = useCallback((transaction = null) => {
+  const openModal = useCallback((transaction = null, defaults = null) => {
     setSelectedTransaction(transaction);
     setIsOpen(true);
+    setModalDefault(defaults);
   }, []);
 
   const closeModal = useCallback(() => {

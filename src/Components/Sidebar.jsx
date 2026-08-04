@@ -1,13 +1,14 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
-// Lista estática de itens do menu lateral, mantida simples para a interface atual.
+// Menu lateral com rotas para as páginas principais.
 const navItems = [
-  { label: "Dashboard", icon: "📊", active: true },
-  { label: "Receitas", icon: "💰" },
-  { label: "Despesas", icon: "🛒" },
-  { label: "Fluxo de Caixa", icon: "📈" },
-  { label: "Relatórios", icon: "📑" },
-  { label: "Configurações", icon: "⚙️" },
+  { label: "Dashboard", icon: "📊", to: "/" },
+  { label: "Receitas", icon: "💰", to: "/receitas" },
+  { label: "Despesas", icon: "🛒", to: "/despesas" },
+  { label: "Fluxo de Caixa", icon: "📈", to: "/" },
+  { label: "Relatórios", icon: "📑", to: "/relatorios" },
+  { label: "Configurações", icon: "⚙️", to: "/" },
 ];
 
 const Sidebar = () => {
@@ -25,17 +26,21 @@ const Sidebar = () => {
 
       <nav className="space-y-2">
         {navItems.map((item) => (
-          <button
+          <NavLink
             key={item.label}
-            className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition ${
-              item.active
-                ? "bg-slate-800 text-white shadow-lg shadow-slate-900/40"
-                : "hover:bg-slate-900 hover:text-white text-slate-400"
-            }`}
+            to={item.to}
+            end={item.to === "/"}
+            className={({ isActive }) =>
+              `flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition ${
+                isActive
+                  ? "bg-slate-800 text-white shadow-lg shadow-slate-900/40"
+                  : "hover:bg-slate-900 hover:text-white text-slate-400"
+              }`
+            }
           >
             <span className="text-lg">{item.icon}</span>
             <span className="text-sm font-medium">{item.label}</span>
-          </button>
+          </NavLink>
         ))}
       </nav>
     </aside>

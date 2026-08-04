@@ -8,6 +8,7 @@ import InsightCard from "./Components/InsightCard";
 import useDashboard from "./hooks/useDashboard";
 import useModal from "./hooks/useModal";
 import TransactionDetailsModal from "./Components/TransactionDetailsModal";
+import Receitas from "./pages/Receitas";
 
 // Componente principal da aplicação: organiza a estrutura visual e delega a lógica ao hook de dashboard.
 function App() {
@@ -36,6 +37,7 @@ function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <div className="flex min-h-screen">
         <Sidebar />
+
 
         <main className="flex-1 px-6 py-6 lg:px-10 lg:py-10 max-w-[1480px] mx-auto">
           <DashboardHeader
@@ -188,22 +190,6 @@ function App() {
             </div>
           )}
 
-          {isOpen && (
-            <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/80 pt-20 backdrop-blur-sm">
-              <div className="w-full max-w-2xl rounded-[32px] border border-slate-800 bg-slate-950 p-6 shadow-2xl shadow-slate-950/60 animate-slide-down">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-white">
-                    {selectedTransaction ? "Editar movimentação" : "Nova movimentação"}
-                  </h2>
-                  <button onClick={closeModal} className="text-slate-400 transition hover:text-white">
-                    ✕
-                  </button>
-                </div>
-
-                <CashForm />
-              </div>
-            </div>
-          )}
           <TransactionDetailsModal />
         </main>
       </div>
