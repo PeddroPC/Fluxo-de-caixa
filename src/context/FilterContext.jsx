@@ -13,12 +13,14 @@ export const FilterProvider = ({ children }) => {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("recent");
+  const [showAllPeriods, setShowAllPeriods] = useState(false);
 
   const setFilters = useCallback(
-    ({ filter: newFilter, search: newSearch, sortBy: newSortBy }) => {
+    ({ filter: newFilter, search: newSearch, sortBy: newSortBy, showAllPeriods: newShowAllPeriods }) => {
       if (newFilter !== undefined) setFilter(newFilter);
       if (newSearch !== undefined) setSearch(newSearch);
       if (newSortBy !== undefined) setSortBy(newSortBy);
+      if (newShowAllPeriods !== undefined) setShowAllPeriods(newShowAllPeriods);
     },
     [],
   );
@@ -28,12 +30,14 @@ export const FilterProvider = ({ children }) => {
       filter,
       search,
       sortBy,
+      showAllPeriods,
       setFilter,
       setSearch,
       setSortBy,
+      setShowAllPeriods,
       setFilters,
     }),
-    [filter, search, sortBy, setFilter, setSearch, setSortBy, setFilters],
+    [filter, search, sortBy, showAllPeriods, setFilter, setSearch, setSortBy, setShowAllPeriods, setFilters],
   );
 
   return (

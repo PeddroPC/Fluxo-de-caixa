@@ -5,7 +5,9 @@ import { CashProvider } from "./CashContext";
 import { FilterProvider } from "./FilterContext";
 import { ModalProvider } from "./ModalContext";
 import { DateProvider } from "./DateContext";
+import { GoalsProvider } from "./GoalsContext";
 import TransactionModal from "../Components/TransactionModal";
+import TransactionDetailsModal from "../Components/TransactionDetailsModal";
 
 // Agrupa todos os providers da aplicação para fornecer contexto global aos componentes.
 const AppProviders = ({ children }) => {
@@ -14,12 +16,15 @@ const AppProviders = ({ children }) => {
       <ToastProvider>
         <DateProvider>
           <CashProvider>
-            <FilterProvider>
-              <ModalProvider>
-                {children}
-                 <TransactionModal/>
+            <GoalsProvider>
+              <FilterProvider>
+                <ModalProvider>
+                  {children}
+                  <TransactionModal />
+                  <TransactionDetailsModal />
                 </ModalProvider>
-            </FilterProvider>
+              </FilterProvider>
+            </GoalsProvider>
           </CashProvider>
         </DateProvider>
       </ToastProvider>

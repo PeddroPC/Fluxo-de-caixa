@@ -1,99 +1,238 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { Plus, TrendingUp, BarChart2, Layers, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import useModal from "../hooks/useModal";
+import useFilteredTransactions from "../hooks/useFilteredTransactions";
+import useRouteFilterReset from "../hooks/useRouteFilterReset";
+import CashModes from "../Components/CashModes";
+import PieChartCard from "../Components/PieChartCard";
 import { useCash } from "../context/CashContext";
+import { useDate } from "../context/DateContext";
+import { formatCurrency, formatDate, getMonthName } from "../Utils/formatters";
+import { getTransactionsByPeriod, getPreviousPeriod } from "../features/dashboard/calculations";
+
+// Card de KPI com comparação semântica com mês anterior
+const KpiCard = ({ label, value, icon: Icon, comparison, accentColor, subValue }) => {
+  const diff = comparison?.difference ?? 0;
+  const percent = comparison?.percent ?? 0;
+  // Para receita: aumento = positivo; redução = negativo
+  const isGood = diff >= 0;
+
+  return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-sm">
+      <div className="mb-3 flex items-center justify-between">
+        <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${accentColor}/10`}>
+          <Icon size={18} className={accentColor} />
+        </div>
+        {comparison && (
+          <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${isGood ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"}`}>
+            {isGood ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
+            {Math.abs(percent).toFixed(1)}%
+          </span>
+        )}
+      </div>
+      <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
+      {comparison && (
+        <p className={`mt-1.5 text-xs ${isGood ? "text-emerald-400" : "text-rose-400"}`}>
+          {isGood ? "+" : ""}{formatCurrency(diff)} vs. mês anterior
+        </p>
+      )}
+      {subValue && !comparison && (
+        <p className="mt-1.5 text-xs text-slate-500">{subValue}</p>
+      )}
+    </div>
+  );
+};
+
+// Estado vazio
+const EmptyState = ({ onAdd }) => (
+  <div className="flex flex-col items-center justify-center py-20 text-center">
+    <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+      <TrendingUp size={28} className="text-emerald-400" />
+    </div>
+    <h3 className="text-lg font-semibold text-white">Nenhuma receita neste período</h3>
+    <p className="mt-2 max-w-sm text-sm text-slate-400">
+      Você não possui receitas registradas para este mês. Registre sua primeira entrada.
+    </p>
+    <button
+      onClick={onAdd}
+      className="mt-6 flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
+    >
+      <Plus size={15} />
+      Nova Receita
+    </button>
+  </div>
+);
 
 const Receitas = () => {
-  const { openModal } = useModal();
+  const { openModal, openTransactionModal } = useModal();
   const { transactions } = useCash();
+  const { selectedPeriod } = useDate();
+
+  const filteredTransactions = useFilteredTransactions("income");
+  useRouteFilterReset({ resetSearch: true, resetShowAllPeriods: false });
 
   const handleOpenReceitaModal = () => openModal(null, { type: "Receita" });
+
+  // KPIs do período atual
+  const totalReceitas = useMemo(
+    () => filteredTransactions.reduce((acc, item) => acc + Number(item.amount || 0), 0),
+    [filteredTransactions],
+  );
+
+  const maiorReceita = useMemo(() => {
+    if (filteredTransactions.length === 0) return null;
+    return filteredTransactions.reduce((max, item) =>
+      Number(item.amount) > Number(max.amount) ? item : max,
+    );
+  }, [filteredTransactions]);
+
+  // Comparação com mês anterior (receitas)
+  const prevPeriod = useMemo(() => getPreviousPeriod(selectedPeriod), [selectedPeriod]);
+  const prevTransactions = useMemo(
+    () => getTransactionsByPeriod(transactions, prevPeriod).filter((t) => t.type === "income"),
+    [transactions, prevPeriod],
+  );
+  const totalPrevReceitas = useMemo(
+    () => prevTransactions.reduce((acc, t) => acc + Number(t.amount || 0), 0),
+    [prevTransactions],
+  );
+
+  const comparison = useMemo(() => {
+    const difference = totalReceitas - totalPrevReceitas;
+    const percent = totalPrevReceitas === 0 ? 0 : (difference / totalPrevReceitas) * 100;
+    return { difference, percent };
+  }, [totalReceitas, totalPrevReceitas]);
+
+  // Distribuição por categoria para o PieChart
+  const categoryData = useMemo(() => {
+    const totals = filteredTransactions.reduce((acc, item) => {
+      const cat = item.category || "Outros";
+      acc[cat] = (acc[cat] || 0) + Number(item.amount || 0);
+      return acc;
+    }, {});
+    return Object.entries(totals)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, value]) => ({ label, value }));
+  }, [filteredTransactions]);
+
+  const prevMonthName = getMonthName(prevPeriod.month);
+
   return (
-    <div className="min-h-screen bg-slate-950 p-8 lg:p-10 font-sans text-slate-100">
-      {/* 1. Cabeçalho & Ação */}
-      <div className="mb-8 flex items-center justify-between">
+    <div className="min-h-screen bg-slate-950 pb-12 font-sans text-slate-100">
+      {/* Header */}
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Receitas
-          </h1>
+          <p className="text-xs uppercase tracking-[0.24em] text-emerald-400/80">Entradas</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">Receitas</h1>
           <p className="mt-1 text-sm text-slate-400">
-            Gerencie suas entradas e recebimentos consolidados.
+            Detalhamento das suas entradas e recebimentos.
           </p>
         </div>
         <button
           onClick={handleOpenReceitaModal}
-          className="flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 font-medium text-white shadow-lg shadow-emerald-500/20 transition-colors hover:bg-emerald-600"
+          className="flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:bg-emerald-400"
         >
-          <span>+</span> Nova Receita
+          <Plus size={15} />
+          Nova Receita
         </button>
       </div>
 
-      {/* 2. KPIs (Cards de Resumo Analítico) */}
-      <div className="mb-8 grid gap-6 sm:grid-cols-3">
-        {transactions.filter((item) => item.type === "income").length > 0 && (
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-sm">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
-              💰 Total Recebido
-            </p>
-            <p className="text-2xl font-bold text-emerald-400">R$ {currentValue.toFixed(2)}</p>
+      {/* KPIs */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label="Total recebido"
+          value={formatCurrency(totalReceitas)}
+          icon={TrendingUp}
+          accentColor="text-emerald-400"
+          comparison={comparison}
+        />
+        <KpiCard
+          label="Lançamentos"
+          value={`${filteredTransactions.length}`}
+          icon={BarChart2}
+          accentColor="text-cyan-400"
+          subValue="entradas neste período"
+        />
+        <KpiCard
+          label="Maior receita"
+          value={maiorReceita ? formatCurrency(maiorReceita.amount) : "R$ 0,00"}
+          icon={ArrowUpRight}
+          accentColor="text-violet-400"
+          subValue={maiorReceita?.description ?? "—"}
+        />
+        <KpiCard
+          label="Mês anterior"
+          value={formatCurrency(totalPrevReceitas)}
+          icon={Layers}
+          accentColor="text-slate-400"
+          subValue={`Total em ${prevMonthName}`}
+        />
+      </div>
+
+      {/* Controles de filtro */}
+      <CashModes />
+
+      {/* Conteúdo principal */}
+      {filteredTransactions.length === 0 ? (
+        <EmptyState onAdd={handleOpenReceitaModal} />
+      ) : (
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_360px]">
+          {/* Lista de receitas */}
+          <div className="rounded-[24px] border border-slate-800 bg-slate-900/70 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+              <h2 className="text-base font-semibold text-white">Lançamentos</h2>
+              <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs text-slate-400">
+                {filteredTransactions.length} entradas
+              </span>
+            </div>
+
+            <div className="divide-y divide-slate-800/60">
+              {filteredTransactions.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => openTransactionModal(item)}
+                  className="flex cursor-pointer items-center justify-between px-5 py-4 transition-colors hover:bg-slate-800/40"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+                      <TrendingUp size={16} className="text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-200">
+                        {item.description}
+                      </p>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                        <span>{formatDate(item.date)}</span>
+                        {item.category && (
+                          <>
+                            <span>•</span>
+                            <span className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-300">
+                              {item.category}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="ml-4 shrink-0 text-base font-bold text-emerald-400">
+                    + {formatCurrency(item.amount)}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* 3. Controles da Lista */}
-      <div className="flex items-center justify-between rounded-t-2xl border border-slate-800 bg-slate-900/50 p-4">
-        <div className="flex items-center gap-4 rounded-lg border border-slate-800 bg-slate-950 px-4 py-2">
-          <button className="text-slate-400 transition-colors hover:text-white">
-            {"<"}
-          </button>
-          <span className="min-w-[80px] text-center text-sm font-medium text-slate-200">
-            Jul 2026
-          </span>
-          <button className="text-slate-400 transition-colors hover:text-white">
-            {">"}
-          </button>
-        </div>
-
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Buscar descrição..."
-            className="w-64 rounded-lg border border-slate-800 bg-slate-950 px-4 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-slate-600 focus:outline-none"
-          />
-        </div>
-      </div>
-
-      {/* 4. Lista de Lançamentos (Apenas Consolidados) */}
-      {transactions.filter((item) => item.type === "income").length === 0 && (
-        <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
-          Nenhuma receita registrada ainda.
+          {/* Distribuição por categoria */}
+          <div>
+            <PieChartCard
+              title="Distribuição de receitas"
+              data={categoryData}
+              subtitle={categoryData[0] ? `Principal: ${categoryData[0].label}` : undefined}
+            />
+          </div>
         </div>
       )}
-      {transactions
-        .filter((item) => item.type === "income")
-        .map((item) => (
-          <div key={item.id} className="flex cursor-pointer items-center justify-between border-b border-slate-800/50 p-4 transition-colors hover:bg-slate-800/30">
-            <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
-                💼
-              </div>
-              <div>
-                <p className="text-base font-medium text-slate-200">
-                  {item.description}
-                </p>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
-                  <span>{item.date}</span>
-                  <span>•</span>
-                  <span className="rounded bg-slate-800 px-2 py-0.5 text-slate-300">
-                    {item.category}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-lg font-bold text-emerald-400">+ R$ {item.amount.toFixed(2)}</p>
-            </div>
-          </div>
-        ))}
     </div>
   );
 };

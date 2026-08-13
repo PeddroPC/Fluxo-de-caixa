@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Wallet, TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import useCash from "./useCash";
 import useDate from "./useDate";
 import useFilters from "./useFilters";
@@ -96,7 +97,7 @@ const useDashboard = () => {
   const summaryCards = [
     {
       title: "Saldo Atual",
-      icon: "💎",
+      icon: Wallet,
       accent: "bg-cyan-500",
       currentValue: summary.balance.currentValue,
       previousValue: summary.balance.previousValue,
@@ -107,7 +108,7 @@ const useDashboard = () => {
     },
     {
       title: "Receitas do período",
-      icon: "⬆️",
+      icon: TrendingUp,
       accent: "bg-emerald-500",
       currentValue: summary.income.currentValue,
       previousValue: summary.income.previousValue,
@@ -118,7 +119,7 @@ const useDashboard = () => {
     },
     {
       title: "Despesas do período",
-      icon: "⬇️",
+      icon: TrendingDown,
       accent: "bg-rose-500",
       currentValue: summary.expense.currentValue,
       previousValue: summary.expense.previousValue,
@@ -129,7 +130,7 @@ const useDashboard = () => {
     },
     {
       title: "Economia",
-      icon: "💼",
+      icon: PiggyBank,
       accent: "bg-sky-500",
       currentValue: summary.economy.currentValue,
       previousValue: summary.economy.previousValue,

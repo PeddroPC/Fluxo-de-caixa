@@ -1,5 +1,6 @@
 import React from "react";
-import { useModal } from "../context/ModalContext"; // Ajuste o caminho se necessário
+import { useModal } from "../context/ModalContext";
+import { useCash } from "../context/CashContext";
 
 const TransactionDetailsModal = () => {
   // Puxando os estados e transação selecionada direto do Contexto
@@ -9,6 +10,7 @@ const TransactionDetailsModal = () => {
     closeTransactionModal, // Assumindo que você tem essa função no contexto para fechar
     openModal, // Função que abre o modal de edição (já usada no seu CashItem)
   } = useModal();
+  const { removeTransaction } = useCash();
 
   // Se estiver fechado:
   if (!isTransactionOpen) return null;
@@ -182,7 +184,7 @@ const TransactionDetailsModal = () => {
           <button
             onClick={() => {
               // Aqui você pode adicionar a lógica de exclusão via contexto ou alert de confirmação
-              console.log("Excluir", selectedTransaction.id);
+              removeTransaction(selectedTransaction.id);
               closeTransactionModal();
             }}
             className="px-5 py-2.5 bg-[#db4a4a] hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors"

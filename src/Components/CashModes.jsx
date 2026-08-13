@@ -4,7 +4,7 @@ import useDate from "../hooks/useDate";
 
 // Controles de visualização para buscar e ordenar as movimentações.
 const CashModes = () => {
-  const { search, sortBy, setSearch, setSortBy } = useFilters();
+  const { search, sortBy, showAllPeriods, setSearch, setSortBy, setShowAllPeriods } = useFilters();
 
   const { prevMonth, nextMonth, selectedPeriod } = useDate();
 
@@ -70,6 +70,17 @@ const CashModes = () => {
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-4 min-w-[240px]">
+        <button
+          type="button"
+          onClick={() => setShowAllPeriods((current) => !current)}
+          className={`rounded-full border px-3 py-2 text-sm transition-colors ${
+            showAllPeriods
+              ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+              : "border-slate-700 bg-slate-800 text-slate-200"
+          }`}
+        >
+          {showAllPeriods ? "Todas as movimentações" : "Só este mês"}
+        </button>
         <input
           className="flex-1 min-w-[180px] rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-sm text-slate-200 placeholder-slate-400 focus:border-slate-500 focus:outline-none"
           type="text"

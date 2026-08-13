@@ -11,6 +11,7 @@ const SummaryCard = ({
   accent,
   comparisonLabel,
 }) => {
+  const IconComponent = icon;
   const trendColor = isPositive ? "text-emerald-400" : "text-rose-400";
   const trendIcon = isPositive ? "▲" : "▼";
   const signedAmount = `${isPositive ? "+" : "-"}R$ ${Math.abs(variationAmount).toFixed(2)}`;
@@ -23,7 +24,7 @@ const SummaryCard = ({
           <span
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${accent} text-lg text-white shadow-md`}
           >
-            {icon}
+            {IconComponent ? <IconComponent size={20} strokeWidth={2} /> : null}
           </span>
 
           <div>
