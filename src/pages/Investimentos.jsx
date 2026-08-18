@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useModal from "../hooks/useModal";
 import { useCash } from "../context/CashContext";
 import { useDate } from "../context/DateContext";
@@ -110,23 +110,35 @@ const Investimentos = () => {
     }));
   }, [filteredInvestments]);
 
-  const patrimonyTimeline = useMemo(
-    () => [
-      { label: "Jan", value: 120000 },
-      { label: "Fev", value: 126000 },
-      { label: "Mar", value: 130000 },
-      { label: "Abr", value: 136000 },
-      { label: "Mai", value: 148000 },
-      { label: "Jun", value: 154000 },
-      { label: "Jul", value: 163000 },
-      { label: "Ago", value: 169000 },
-      { label: "Set", value: 176000 },
-      { label: "Out", value: 182000 },
-      { label: "Nov", value: 191000 },
-      { label: "Dez", value: 197000 },
-    ],
-    [],
-  );
+  const patrimonyTimeline = useMemo(() => {
+    const history = [];
+    const monthsToShow = 6;
+
+    for (let i = monthsToShow - 1; i >= 0; i -= 1) {
+      const date = new Date(selectedPeriod.year, selectedPeriod.month - 1 - i, 1);
+      const monthNumber = date.getMonth() + 1;
+      const monthTransactions = transactions.filter((item) => {
+        if (item.type !== "investment") return false;
+        const transactionDate = new Date(item.date);
+        return (
+          transactionDate.getFullYear() === date.getFullYear() &&
+          transactionDate.getMonth() === date.getMonth()
+        );
+      });
+
+      const value = monthTransactions.reduce(
+        (sum, item) => sum + Number(item.currentValue ?? item.amount ?? 0),
+        0,
+      );
+
+      history.push({
+        label: monthNames[monthNumber - 1],
+        value,
+      });
+    }
+
+    return history;
+  }, [selectedPeriod, transactions]);
 
   const distributionData = useMemo(() => {
     const amountByType = filteredInvestments.reduce((acc, item) => {

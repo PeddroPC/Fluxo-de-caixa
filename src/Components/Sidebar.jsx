@@ -6,6 +6,7 @@ import {
   TrendingDown,
   BarChart3,
   Target,
+  FileBarChart2,
 } from "lucide-react";
 import logo from "../assets/logo.png";
 
@@ -33,6 +34,14 @@ const navItems = [
     accentColor: "text-rose-400",
     activeBg: "bg-rose-500/10",
     activeBorder: "border-l-2 border-rose-500",
+  },
+  {
+    label: "Relatórios",
+    icon: FileBarChart2,
+    to: "/relatorios",
+    accentColor: "text-violet-400",
+    activeBg: "bg-violet-500/10",
+    activeBorder: "border-l-2 border-violet-500",
   },
   {
     label: "Investimentos",
