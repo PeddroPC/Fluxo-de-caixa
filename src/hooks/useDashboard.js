@@ -84,6 +84,7 @@ const useDashboard = () => {
   const pieData = useMemo(
     () =>
       Object.entries(summary.categoryTotals)
+        .filter(([, value]) => value > 0)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 5)
         .map(([label, value]) => ({ label, value })),
@@ -153,7 +154,66 @@ const useDashboard = () => {
     comparisonLabel: `Comparado com ${previousPeriodLabel}`,
   };
 
+  // Dados para o gráfico de Fluxo de Caixa (últimos 6 meses)
+  const cashFlowData = useMemo(() => {
+    const today = new Date();
+    let runningBalance = 0;
+
+    return Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(today.getFullYear(), today.getMonth() - (5 - i), 1);
+      const period = { month: d.getMonth() + 1, year: d.getFullYear() };
+      const periodTxs = getTransactionsByPeriod(transactions, period);
+
+      const income = periodTxs
+        .filter((t) => t.type === "income")
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+      const expense = periodTxs
+        .filter((t) => t.type === "expense")
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+      runningBalance += income - expense;
+
+      return {
+        name: monthNames[period.month - 1],
+        Receitas: income,
+        Despesas: expense,
+        Saldo: runningBalance,
+      };
+    });
+  }, [transactions]);
+
+  // Transações futuras do período atual (próximos vencimentos)
+  // Apenas despesas, a partir de hoje, ordenadas por data
+  const upcomingTransactions = useMemo(() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+    return periodTransactions
+      .filter((t) => t.type === "expense" && t.date >= todayStr)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 6);
+  }, [periodTransactions]);
+
+  // Verifica se há transações em atraso (type === expense, date < hoje, no período)
+  const hasOverdueItems = useMemo(() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    return periodTransactions.some(
+      (t) => t.type === "expense" && t.date < todayStr,
+    );
+  }, [periodTransactions]);
+
+  const upcomingTotal = useMemo(
+    () => upcomingTransactions.reduce((sum, t) => sum + Number(t.amount || 0), 0),
+    [upcomingTransactions],
+  );
+
+  // Ações de modal com tipo pré-definido
   const handleOpenModal = () => openModal(null);
+  const openIncomeModal = () => openModal(null, { type: "income" });
+  const openExpenseModal = () => openModal(null, { type: "expense" });
+
   const handleDeleteRequest = (id) => setPendingDeleteId(id);
 
   const confirmDelete = () => {
@@ -173,15 +233,23 @@ const useDashboard = () => {
 
   return {
     balanceValue: summary.balance.currentValue,
+    summary,
     summaryCards,
     investmentSummary,
-    recentTransactions: summary.recentTransactions.slice(0, 5),
+    recentTransactions: summary.recentTransactions.slice(0, 7),
     sortedData,
     pieData,
     topCategory,
     periodLabel,
+    previousPeriodLabel,
+    cashFlowData,
+    upcomingTransactions,
+    upcomingTotal,
+    hasOverdueItems,
     pendingDeleteId,
     handleOpenModal,
+    openIncomeModal,
+    openExpenseModal,
     handleDeleteRequest,
     confirmDelete,
     cancelDelete,

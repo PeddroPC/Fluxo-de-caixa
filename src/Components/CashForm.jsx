@@ -52,7 +52,7 @@ const getInitialFormState = () => ({
 // Formulário reutilizável para cadastro e edição de movimentações financeiras.
 const CashForm = () => {
   const { addTransaction, updateTransaction } = useCash();
-  const { selectedTransaction, closeModal } = useModal();
+  const { selectedTransaction, closeModal, modalDefault } = useModal();
   const { showToast } = useToast();
   const textareaRef = useRef(null);
   const [formData, setFormData] = useState(getInitialFormState);
@@ -123,6 +123,7 @@ const CashForm = () => {
   };
 
   // Quando a modal entra em modo de edição, preenche o formulário com os dados da transação selecionada.
+  // Quando aberta com modalDefault, usa o tipo pré-definido (ex: 'income' ou 'expense').
   useEffect(() => {
     if (selectedTransaction) {
       setFormData({
@@ -140,9 +141,17 @@ const CashForm = () => {
         maturityDate: selectedTransaction.maturityDate ?? "",
       });
     } else {
-      setFormData(getInitialFormState());
+      const initial = getInitialFormState();
+      if (modalDefault?.type) {
+        initial.type = modalDefault.type;
+        // Ajusta categoria padrão ao tipo
+        if (modalDefault.type === "investment") {
+          initial.category = "";
+        }
+      }
+      setFormData(initial);
     }
-  }, [selectedTransaction]);
+  }, [selectedTransaction, modalDefault]);
 
   // Atualiza a observação e ajusta a altura do textarea conforme o conteúdo cresce.
   const handleObservationChange = (e) => {

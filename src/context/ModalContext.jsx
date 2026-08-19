@@ -32,8 +32,8 @@ export const ModalProvider = ({ children }) => {
   }
 
   const value = useMemo(
-    () => ({ isOpen, selectedTransaction, openModal, closeModal, setSelectedTransaction, openTransactionModal, closeTransactionModal, isTransactionOpen }),
-    [isOpen, selectedTransaction, openModal, closeModal, isTransactionOpen],
+    () => ({ isOpen, selectedTransaction, openModal, closeModal, setSelectedTransaction, openTransactionModal, closeTransactionModal, isTransactionOpen, modalDefault }),
+    [isOpen, selectedTransaction, openModal, closeModal, isTransactionOpen, modalDefault],
   );
 
   return <ModalContext.Provider value={value}>{children}</ModalContext.Provider>;
