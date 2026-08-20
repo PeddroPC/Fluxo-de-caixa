@@ -79,7 +79,7 @@ const PieChartCard = ({ title, data, subtitle }) => {
               { total: 0, paths: [] },
             ).paths}
             {/* Anel interno */}
-            <circle cx="16" cy="16" r="7" fill="#0f172a" />
+            <circle cx="16" cy="16" r="7" fill="var(--background)" />
           </svg>
           {/* Label central */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">

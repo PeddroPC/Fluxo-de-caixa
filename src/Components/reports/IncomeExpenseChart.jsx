@@ -63,10 +63,10 @@ const IncomeExpenseChart = ({ data }) => {
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
-            <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" vertical={false} />
+            <XAxis dataKey="label" tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
+              tick={{ fill: "var(--chart-label)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => `R$${Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}`}

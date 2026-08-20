@@ -101,15 +101,15 @@ const CashFlowChart = ({ data = [] }) => {
           <div className="h-52 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data} barCategoryGap="28%" barGap={3} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
                 <XAxis
                   dataKey="name"
-                  tick={{ fill: "#64748b", fontSize: 11 }}
+                  tick={{ fill: "var(--chart-label)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: "#64748b", fontSize: 10 }}
+                  tick={{ fill: "var(--chart-label)", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                   width={54}
@@ -117,7 +117,7 @@ const CashFlowChart = ({ data = [] }) => {
                     v >= 1000 ? `R$${(v / 1000).toFixed(0)}k` : `R$${v}`
                   }
                 />
-                <Tooltip content={<CashFlowTooltip />} cursor={{ fill: "#1e293b40" }} />
+                <Tooltip content={<CashFlowTooltip />} cursor={{ fill: "var(--chart-grid)" }} />
                 <Bar dataKey="Receitas" fill="#34d399" radius={[5, 5, 0, 0]} opacity={0.85} />
                 <Bar dataKey="Despesas" fill="#f87171" radius={[5, 5, 0, 0]} opacity={0.75} />
                 <Line

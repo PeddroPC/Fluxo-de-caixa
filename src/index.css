@@ -19,6 +19,93 @@ html, body, #root {
   height: 100%;
 }
 
+html {
+  color-scheme: dark;
+  background: var(--background);
+}
+
+:root {
+  --background: #0b1120;
+  --surface: #111827;
+  --surface-secondary: #172033;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border: #263247;
+  --primary: #14b8a6;
+  --primary-hover: #2dd4bf;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+  --input-background: #1e293b;
+  --input-border: #334155;
+  --shadow: rgba(2, 6, 23, 0.42);
+  --chart-grid: #263247;
+  --chart-label: #64748b;
+}
+
+html.light {
+  color-scheme: light;
+  --background: #f4f7fb;
+  --surface: #ffffff;
+  --surface-secondary: #eef3f8;
+  --text-primary: #172033;
+  --text-secondary: #526174;
+  --border: #d7e0ea;
+  --primary: #0f8f8a;
+  --primary-hover: #0b7773;
+  --success: #087f5b;
+  --warning: #a16207;
+  --danger: #be123c;
+  --input-background: #ffffff;
+  --input-border: #bdc9d7;
+  --shadow: rgba(31, 49, 72, 0.12);
+  --chart-grid: #d7e0ea;
+  --chart-label: #526174;
+}
+
+html, body, #root {
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+/* Keep the current Tailwind markup while routing its neutral palette through theme tokens. */
+html.light [class~="bg-slate-950"],
+html.light [class~="bg-slate-950/70"],
+html.light [class~="bg-slate-950/60"],
+html.light [class~="bg-slate-950/50"],
+html.light [class~="bg-slate-950/80"] { background-color: var(--background) !important; }
+html.light [class~="bg-slate-900"],
+html.light [class~="bg-slate-900/70"],
+html.light [class~="bg-slate-900/80"],
+html.light [class~="bg-slate-900/60"],
+html.light [class~="bg-slate-900/50"] { background-color: var(--surface) !important; }
+html.light [class~="bg-slate-800"],
+html.light [class~="bg-slate-800/80"],
+html.light [class~="bg-slate-800/60"],
+html.light [class~="bg-slate-800/40"] { background-color: var(--surface-secondary) !important; }
+html.light [class~="border-slate-800"],
+html.light [class~="border-slate-800/60"],
+html.light [class~="border-slate-700"],
+html.light [class~="border-slate-700/50"] { border-color: var(--border) !important; }
+html.light [class~="text-white"],
+html.light [class~="text-slate-100"],
+html.light [class~="text-slate-200"] { color: var(--text-primary) !important; }
+html.light [class~="text-slate-300"],
+html.light [class~="text-slate-400"] { color: var(--text-secondary) !important; }
+html.light [class~="text-slate-500"],
+html.light [class~="text-slate-600"] { color: #66778b !important; }
+html.light [class~="bg-slate-700"] { background-color: var(--input-background) !important; }
+html.light input,
+html.light select,
+html.light textarea { background-color: var(--input-background); border-color: var(--input-border); color: var(--text-primary); }
+html.light input::placeholder,
+html.light textarea::placeholder { color: #7b8a9c; }
+
+button, input, select, textarea, [class*="border-"] {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -26,10 +113,10 @@ body {
 
 /* subtle glass card background for panels */
 .glass {
-  background: rgba(15, 23, 42, 0.6);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
   backdrop-filter: blur(6px);
 }
 
 .card-shadow {
-  box-shadow: 0 8px 20px rgba(2,6,23,0.6);
+  box-shadow: 0 8px 20px var(--shadow);
 }

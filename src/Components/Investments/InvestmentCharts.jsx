@@ -64,9 +64,9 @@ const InvestmentCharts = ({ patrimonyTimeline, distributionData, profitabilityDa
                       <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`} />
+                  <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" vertical={false} />
+                  <XAxis dataKey="label" tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(value) => `R$${(value / 1000).toFixed(0)}k`} />
                   <Tooltip content={<ChartTooltip />} />
                   <Area type="monotone" dataKey="value" name="Patrimônio" stroke="#38bdf8" fill="url(#investmentFill)" strokeWidth={3} />
                 </AreaChart>
@@ -121,9 +121,9 @@ const InvestmentCharts = ({ patrimonyTimeline, distributionData, profitabilityDa
               <div className="mt-4 h-52 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={profitabilityData} layout="vertical" margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
-                    <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" horizontal={false} />
-                    <XAxis type="number" domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} />
-                    <YAxis dataKey="label" type="category" tick={{ fill: "#cbd5e1", fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
+                    <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" horizontal={false} />
+                    <XAxis type="number" domain={[0, 100]} tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis dataKey="label" type="category" tick={{ fill: "var(--text-secondary)", fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
                     <Tooltip formatter={(value) => [`${Number(value).toFixed(2)}%`, "Rentabilidade"]} />
                     <Bar dataKey="value" fill="#34d399" radius={[0, 8, 8, 0]} />
                   </BarChart>

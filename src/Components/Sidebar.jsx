@@ -7,8 +7,11 @@ import {
   BarChart3,
   Target,
   FileBarChart2,
+  Moon,
+  Sun,
 } from "lucide-react";
 import logo from "../assets/logo.png";
+import { useTheme } from "../context/ThemeContext";
 
 const navItems = [
   {
@@ -62,18 +65,30 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <aside className="w-64 shrink-0 border-r border-slate-800 bg-slate-950 flex flex-col">
       {/* Logo */}
       <div className="p-6 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-sky-600 shadow-lg shadow-cyan-500/20">
-            <img src={logo} alt="CashPilot" className="h-7 w-7 object-contain" />
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-sky-600 shadow-lg shadow-cyan-500/20">
+              <img src={logo} alt="CashPilot" className="h-7 w-7 object-contain" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Sistema</p>
+              <h1 className="text-lg font-bold leading-tight text-white">CashPilot</h1>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Sistema</p>
-            <h1 className="text-lg font-bold text-white leading-tight">CashPilot</h1>
-          </div>
+          <button
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+            title={theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro"}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-slate-800/80 text-amber-300 transition-colors hover:border-cyan-400/60 hover:bg-slate-700 hover:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/70"
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
         </div>
       </div>
 

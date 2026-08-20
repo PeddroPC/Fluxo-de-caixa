@@ -84,9 +84,9 @@ const InvestmentPerformance = ({ data, summary }) => {
                 <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="label" tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: "#94a3b8", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <CartesianGrid stroke="var(--chart-grid)" strokeDasharray="4 4" vertical={false} />
+            <XAxis dataKey="label" tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill: "var(--chart-label)", fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<ChartTooltip />} />
             <Area type="monotone" dataKey="investido" name="Investido" stroke="#a78bfa" fill="url(#investedFill)" strokeWidth={2.5} />
             <Area type="monotone" dataKey="valorAtual" name="Valor atual" stroke="#38bdf8" fill="url(#currentFill)" strokeWidth={2.5} />
